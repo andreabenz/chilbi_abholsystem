@@ -2,7 +2,7 @@ import subprocess
 import os
 
 # Verzeichnis festlegen
-verzeichnis = r"C:\Users\Flo\NAS Cevi WIE\OK\Chilbi\2024_Chilbi\Abholsystem"
+verzeichnis = r"C:\Users\Cevi WIE\Abholsystem"
 
 # Streamlit-Skripte festlegen
 eingabe_script = os.path.join(verzeichnis, "eingabe.py")

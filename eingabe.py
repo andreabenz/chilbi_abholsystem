@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 # Seitenkonfiguration für volle Breite
@@ -10,11 +10,11 @@ st.set_page_config(
 )
 
 # Definiere den absoluten Pfad zur CSV-Datei und zur Audio-Datei
-csv_file_path = r"C:\Users\Flo\NAS Cevi WIE\OK\Chilbi\2024_Chilbi\Abholsystem\bestellungen.csv"
-audio_file_path = r"C:\Users\Flo\NAS Cevi WIE\OK\Chilbi\2024_Chilbi\Abholsystem\Glocke.mp3"
+csv_file_path = r"C:\Users\Cevi WIE\Abholsystem\bestellungen.csv"
+audio_file_path = r"C:\Users\Cevi WIE\Abholsystem\Glocke.mp3"
 
 # Logo oben links einfügen
-logo_path = r"C:\Users\Flo\NAS Cevi WIE\OK\Chilbi\2024_Chilbi\Abholsystem\Logo.png"
+logo_path = r"C:\Users\Cevi WIE\Abholsystem\Logo.png"
 st.image(logo_path, width=300)
 
 # Hintergrundfarbe und Schriftgrößen anpassen
@@ -145,41 +145,41 @@ with col1:
         st.session_state.audio_played = False  # Setze Audio-Status zurück
 
 with col2:
-    st.subheader("Fertige Bestellungen zur Abholung:")  # Titel wieder hinzugefügt
+    st.subheader("Fertige Bestellungen zur Abholung:")
     if os.path.exists(csv_file_path):
         df = pd.read_csv(csv_file_path)
         if not df.empty:
-            # Erstelle eine Liste für die Buttons für nicht abgeholte Bestellungen
-            buttons = []
-            for index, row in df.iterrows():
-                if row['Status'] == "nicht abgeholt":
-                    buttons.append(row['Bestellnummer'])
+            # Zeitstempel in datetime konvertieren
+            df['Zeitstempel'] = pd.to_datetime(df['Zeitstempel'])
+            zeitgrenze = datetime.now() - timedelta(minutes=30)
 
-            # Teile die Buttons in zwei Spalten auf
-            cols = st.columns(2)
-            for i, button in enumerate(buttons):
-                col_index = i % 2
-                with cols[col_index]:
-                    if st.button(f"Abholen {button}", key=f"abholen_{button}"):
-                        bestellung_abholen(button)
-
-            # Füge den horizontalen Strich hinzu
-            st.markdown("<hr>", unsafe_allow_html=True)  # Hier wird die Linie hinzugefügt
-            
-            # Abgeholte Bestellungen auflisten
-            st.subheader("Abgeholte Bestellungen:")
-            abgeholte_buttons = df[df['Status'] == "abgeholt"]['Bestellnummer'].tolist()
-
-            # Erstelle Buttons für die abgeholten Bestellungen
-            if abgeholte_buttons:
-                cols_abgeholt = st.columns(2)
-                for i, button in enumerate(abgeholte_buttons):
-                    col_index = i % 2
-                    with cols_abgeholt[col_index]:
-                        if st.button(f"Bestellung {button} zurücksetzen", key=f"zuruecksetzen_{button}"):
-                            bestellung_zuruecksetzen(button)  # Setze den Status zurück
+            # --- Nicht abgeholte Bestellungen ---
+            nicht_abgeholt_buttons = df[(df['Status'] == "nicht abgeholt") & (df['Zeitstempel'] >= zeitgrenze)]['Bestellnummer'].unique().tolist()
+            if nicht_abgeholt_buttons:
+                cols = st.columns(4)  # 4 Spalten
+                for i, button in enumerate(nicht_abgeholt_buttons):
+                    col_index = i % 4
+                    with cols[col_index]:
+                        button_key = f"abholen_{button}_{i}"
+                        if st.button(f"Abholen {button}", key=button_key):
+                            bestellung_abholen(button)
             else:
-                st.write("Keine abgeholten Bestellungen.")
+                st.write("Keine aktuellen Bestellungen.")
+
+            st.markdown("<hr>", unsafe_allow_html=True)
+
+            # --- Abgeholte Bestellungen ---
+            abgeholte_buttons = df[(df['Status'] == "abgeholt") & (df['Zeitstempel'] >= zeitgrenze)]['Bestellnummer'].unique().tolist()
+            if abgeholte_buttons:
+                cols_abgeholt = st.columns(4)  # 4 Spalten
+                for i, button in enumerate(abgeholte_buttons):
+                    col_index = i % 4
+                    with cols_abgeholt[col_index]:
+                        button_key = f"zuruecksetzen_{button}_{i}"
+                        if st.button(f"Bestellung {button} zurücksetzen", key=button_key):
+                            bestellung_zuruecksetzen(button)
+            else:
+                st.write("Keine abgeholten Bestellungen in den letzten 30 Minuten.")
         else:
             st.write("Keine aktuellen Bestellungen.")
     else:
