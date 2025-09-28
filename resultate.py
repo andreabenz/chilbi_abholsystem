@@ -10,10 +10,10 @@ st.set_page_config(
 )
 
 # Definiere den absoluten Pfad zur CSV-Datei
-csv_file_path = r"C:\Users\Flo\NAS Cevi WIE\OK\Chilbi\2024_Chilbi\Abholsystem\bestellungen.csv"
+csv_file_path = r"C:\Users\Cevi WIE\Abholsystem\bestellungen.csv"
 
 # Logo oben links einfügen
-logo_path = r"C:\Users\Flo\NAS Cevi WIE\OK\Chilbi\2024_Chilbi\Abholsystem\Logo.png"  # Pfad zum Logo anpassen
+logo_path = r"C:\Users\Cevi WIE\Abholsystem\Logo.png" # Pfad zum Logo anpassen
 st.image(logo_path, width=300)
 
 
