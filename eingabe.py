@@ -164,7 +164,7 @@ with col2:
                         if st.button(f"Abholen {button}", key=button_key):
                             bestellung_abholen(button)
             else:
-                st.write("Keine aktuellen Bestellungen zur Abholung in den letzten 30 Minuten.")
+                st.write("Keine aktuellen Bestellungen.")
 
             st.markdown("<hr>", unsafe_allow_html=True)
 
